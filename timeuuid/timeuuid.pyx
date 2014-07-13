@@ -12,13 +12,13 @@ from uuid cimport uint64_t
 from uuid cimport uuid_parse
 from uuid cimport uuid_t
 
+
 cdef class TimeUUID:
   cdef uuid_t _bytes
   cdef readonly uint64_t time
   cdef public bint reverse
-  cdef bytes pystr
   
-  def __cinit__(TimeUUID self, str uuid_pystr, bool reverse=False):
+  def __cinit__(TimeUUID self, uuid_pystr, bool reverse=False):
     uuid_pyutf8 = uuid_pystr.encode('utf-8')
     cdef char *uuid_cstr = uuid_pyutf8
     uuid_parse(uuid_cstr, self._bytes)
@@ -58,7 +58,7 @@ cdef class TimeUUID:
     
     return result ^ self.reverse
 
-  def __repr__(self):
+  def __str__(self):
     # XXX: This is a slow function. Purposefully so because the main goal
     # is low memory footprint, fast object construction and fast cmp.
     i = 0
@@ -66,6 +66,9 @@ cdef class TimeUUID:
       i = (i << 8) | ord(b)
     h = '%032x' % i
     return '%s-%s-%s-%s-%s' % (h[:8], h[8:12], h[12:16], h[16:20], h[20:])
+
+  def __repr__(self):
+    return 'TimeUUID(%s)' % self.__str__()
 
   property bytes:
     def __get__(self):

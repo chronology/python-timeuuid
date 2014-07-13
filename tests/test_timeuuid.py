@@ -54,6 +54,8 @@ class TestTimeUUID(unittest.TestCase):
       self.assertTrue(uu >= ruu)
       self.assertFalse(uu != ruu)
 
-  def test_repr(self):
+  def test_str(self):
     for uuid_str in get_str_uuids(1000):
-      self.assertEqual(uuid_str, repr(TimeUUID(uuid_str)))
+      tuu = TimeUUID(uuid_str)
+      self.assertEqual(uuid_str, str(tuu))
+      self.assertEqual('TimeUUID(%s)' % uuid_str, repr(tuu))
