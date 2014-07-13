@@ -16,6 +16,7 @@ cdef class TimeUUID:
   cdef uuid_t _bytes
   cdef readonly uint64_t time
   cdef public bint reverse
+  cdef bytes pystr
   
   def __cinit__(TimeUUID self, str uuid_pystr, bool reverse=False):
     uuid_pyutf8 = uuid_pystr.encode('utf-8')
@@ -56,6 +57,15 @@ cdef class TimeUUID:
                                           bytes_cmp < 0)
     
     return result ^ self.reverse
+
+  def __repr__(self):
+    # XXX: This is a slow function. Purposefully so because the main goal
+    # is low memory footprint, fast object construction and fast cmp.
+    i = 0
+    for b in self._bytes[:16]:
+      i = (i << 8) | ord(b)
+    h = '%032x' % i
+    return '%s-%s-%s-%s-%s' % (h[:8], h[8:12], h[12:16], h[16:20], h[20:])
 
   property bytes:
     def __get__(self):
