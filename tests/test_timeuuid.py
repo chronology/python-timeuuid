@@ -42,17 +42,18 @@ class TestTimeUUID(unittest.TestCase):
       self.assertFalse(uuids[i - 1] == uuids[i])
       self.assertTrue(uuids[i - 1] != uuids[i])
 
-  def test_reverse(self):
+  def test_descending(self):
     uuid_strs = list(get_str_uuids(100))
     uuids = sorted(map(lambda s: TimeUUID(s), uuid_strs))
-    reverse_uuids = sorted(map(lambda s: TimeUUID(s, reverse=True), uuid_strs))
-    self.assertEqual(uuids, reverse_uuids[::-1])
+    descending_uuids = sorted(map(lambda s: TimeUUID(s, descending=True),
+                                  uuid_strs))
+    self.assertEqual(uuids, descending_uuids[::-1])
 
-    for uu, ruu in zip(uuids, reverse_uuids[::-1]):
-      self.assertTrue(uu == ruu)
-      self.assertTrue(uu <= ruu)
-      self.assertTrue(uu >= ruu)
-      self.assertFalse(uu != ruu)
+    for uu, duu in zip(uuids, descending_uuids[::-1]):
+      self.assertTrue(uu == duu)
+      self.assertTrue(uu <= duu)
+      self.assertTrue(uu >= duu)
+      self.assertFalse(uu != duu)
 
   def test_str(self):
     for uuid_str in get_str_uuids(1000):

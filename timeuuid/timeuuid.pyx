@@ -16,9 +16,16 @@ from uuid cimport uuid_t
 cdef class TimeUUID:
   cdef uuid_t _bytes
   cdef readonly uint64_t time
-  cdef public bint reverse
+  cdef public bint descending
   
-  def __cinit__(TimeUUID self, uuid_pystr, bool reverse=False):
+  def __cinit__(TimeUUID self, uuid_pystr, bool descending=False):
+    """
+    Creates a new TimeUUID object instance.
+    `uuid_pystr`: A Python string type object which represents the UUID in its
+                  canonical form, e.g. '550e8400-e29b-41d4-a716-446655440000'
+    `descending`: Should the result of __richcmp__ sort based on descending
+                  order? (optional, False by default)
+    """
     uuid_pyutf8 = uuid_pystr.encode('utf-8')
     cdef char *uuid_cstr = uuid_pyutf8
     uuid_parse(uuid_cstr, self._bytes)
@@ -35,7 +42,7 @@ cdef class TimeUUID:
     tmp = (self._bytes[6] << 8) | self._bytes[7]
     self.time = self.time | ((tmp & 0xfff) << 48)
 
-    self.reverse = reverse
+    self.descending = descending
 
   def __richcmp__(TimeUUID self, TimeUUID other, int op):
     cdef bint result = 0
@@ -56,7 +63,7 @@ cdef class TimeUUID:
       result = self.time < other.time or (self.time == other.time and
                                           bytes_cmp < 0)
     
-    return result ^ self.reverse
+    return result ^ self.descending
 
   def __str__(self):
     # XXX: This is a slow function. Purposefully so because the main goal
