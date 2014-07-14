@@ -20,13 +20,13 @@ def timeit(name):
   yield
   print '>', name, 'took', '%ss' % (time.time() - start)
 
-def test_create_perf():
+def test_create():
   print
   for cls in [UUID, TimeUUID]:
     with timeit(cls.__name__):
       create(cls, 250000)
 
-def test_cmp_perf():
+def test_cmp():
   print
   for cls in [UUID, TimeUUID]:
     uuids = create(cls, 100000)

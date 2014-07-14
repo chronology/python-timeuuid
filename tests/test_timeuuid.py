@@ -9,32 +9,54 @@ from timeuuid import TimeUUID
 def py_cmp(tu1, tu2):
   return cmp((tu1.time, tu1.bytes), (tu2.time, tu2.bytes))
 
-def get_uuids(n=1, version=1):
-  if version == 1:
-    u = lambda: uuid.uuid1(random.randint(0, 2**48 - 1))
-  elif version == 4:
-    u = lambda: uuid.uuid4()
-  else:
-    raise ValueError
+def get_str_uuids(n):
   for _ in xrange(n):
-    yield str(u())
+    yield str(uuid.uuid4())
 
 class TestTimeUUID(unittest.TestCase):
   def test_time(self):
-    for _id in get_uuids(n=5000):
+    for _id in get_str_uuids(5000):
       uu = UUID(_id)
       tuu = TimeUUID(_id)
       self.assertEqual(uu.time, tuu.time)
 
   def test_bytes(self):
-    for _id in get_uuids(n=5000, version=4):
+    for _id in get_str_uuids(5000):
       uu = UUID(_id)
       tuu = TimeUUID(_id)
       self.assertEqual(uu.bytes, tuu.bytes)
 
   def test_cmp(self):
-    uuids = map(lambda s: TimeUUID(s), get_uuids(n=5000))
+    uuids = map(lambda s: TimeUUID(s), get_str_uuids(5000))
     random.shuffle(uuids)
     for _ in xrange(5000):
       a, b = random.choice(uuids), random.choice(uuids)
       self.assertEqual(cmp(a, b), py_cmp(a, b))
+
+    for _ in xrange(100):
+      i = random.randint(1, 4999)
+      self.assertTrue(uuids[i] == uuids[i])
+      self.assertTrue(uuids[i] >= uuids[i])
+      self.assertTrue(uuids[i] <= uuids[i])
+      self.assertFalse(uuids[i] != uuids[i])
+      self.assertFalse(uuids[i - 1] == uuids[i])
+      self.assertTrue(uuids[i - 1] != uuids[i])
+
+  def test_descending(self):
+    uuid_strs = list(get_str_uuids(100))
+    uuids = sorted(map(lambda s: TimeUUID(s), uuid_strs))
+    descending_uuids = sorted(map(lambda s: TimeUUID(s, descending=True),
+                                  uuid_strs))
+    self.assertEqual(uuids, descending_uuids[::-1])
+
+    for uu, duu in zip(uuids, descending_uuids[::-1]):
+      self.assertTrue(uu == duu)
+      self.assertTrue(uu <= duu)
+      self.assertTrue(uu >= duu)
+      self.assertFalse(uu != duu)
+
+  def test_str(self):
+    for uuid_str in get_str_uuids(1000):
+      tuu = TimeUUID(uuid_str)
+      self.assertEqual(uuid_str, str(tuu))
+      self.assertEqual('TimeUUID(%s)' % uuid_str, repr(tuu))

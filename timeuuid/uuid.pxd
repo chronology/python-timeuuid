@@ -4,6 +4,7 @@ cdef extern from *:
   ctypedef char* const_char_ptr "const char*"
 
 cdef extern from 'stdint.h' nogil:
+  ctypedef signed int int32_t
   ctypedef unsigned long long uint64_t
 
 cdef extern from 'string.h' nogil:
