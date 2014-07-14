@@ -24,7 +24,8 @@ cdef class TimeUUID:
     `uuid_pystr`: A Python string type object which represents the UUID in its
                   canonical form, e.g. '550e8400-e29b-41d4-a716-446655440000'
     `descending`: Should the result of __richcmp__ sort based on descending
-                  order? (optional, False by default)
+                  order? (optional, False by default, which sorts in ascending
+                  order)
     """
     uuid_pyutf8 = uuid_pystr.encode('utf-8')
     cdef char *uuid_cstr = uuid_pyutf8
