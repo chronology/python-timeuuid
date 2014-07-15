@@ -15,26 +15,26 @@ def get_str_uuids(n):
 
 class TestTimeUUID(unittest.TestCase):
   def test_time(self):
-    for _id in get_str_uuids(5000):
-      uu = UUID(_id)
-      tuu = TimeUUID(_id)
+    for uuid_str in get_str_uuids(10000):
+      uu = UUID(uuid_str)
+      tuu = TimeUUID(uuid_str)
       self.assertEqual(uu.time, tuu.time)
 
   def test_bytes(self):
-    for _id in get_str_uuids(5000):
+    for _id in get_str_uuids(10000):
       uu = UUID(_id)
       tuu = TimeUUID(_id)
       self.assertEqual(uu.bytes, tuu.bytes)
 
   def test_cmp(self):
-    uuids = map(lambda s: TimeUUID(s), get_str_uuids(5000))
+    uuids = map(lambda s: TimeUUID(s), get_str_uuids(10000))
     random.shuffle(uuids)
-    for _ in xrange(5000):
+    for _ in xrange(10000):
       a, b = random.choice(uuids), random.choice(uuids)
       self.assertEqual(cmp(a, b), py_cmp(a, b))
 
-    for _ in xrange(100):
-      i = random.randint(1, 4999)
+    for _ in xrange(1000):
+      i = random.randint(1, 9999)
       self.assertTrue(uuids[i] == uuids[i])
       self.assertTrue(uuids[i] >= uuids[i])
       self.assertTrue(uuids[i] <= uuids[i])
@@ -43,7 +43,7 @@ class TestTimeUUID(unittest.TestCase):
       self.assertTrue(uuids[i - 1] != uuids[i])
 
   def test_descending(self):
-    uuid_strs = list(get_str_uuids(100))
+    uuid_strs = list(get_str_uuids(10000))
     uuids = sorted(map(lambda s: TimeUUID(s), uuid_strs))
     descending_uuids = sorted(map(lambda s: TimeUUID(s, descending=True),
                                   uuid_strs))
@@ -56,7 +56,14 @@ class TestTimeUUID(unittest.TestCase):
       self.assertFalse(uu != duu)
 
   def test_str(self):
-    for uuid_str in get_str_uuids(1000):
+    for uuid_str in get_str_uuids(10000):
       tuu = TimeUUID(uuid_str)
       self.assertEqual(uuid_str, str(tuu))
       self.assertEqual('TimeUUID(%s)' % uuid_str, repr(tuu))
+
+  def test_bytes_init(self):
+    for uuid_str in get_str_uuids(10000):
+      uu = UUID(uuid_str)
+      tuu1 = TimeUUID(str(uu))
+      tuu2 = TimeUUID(bytes=uu.bytes)
+      self.assertEqual(tuu1, tuu2)

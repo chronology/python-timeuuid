@@ -8,6 +8,7 @@ from cpython.object cimport Py_EQ, Py_GE, Py_GT, Py_LE, Py_LT, Py_NE
 
 from uuid cimport int32_t
 from uuid cimport memcmp
+from uuid cimport memcpy
 from uuid cimport uint64_t
 from uuid cimport uuid_parse
 from uuid cimport uuid_t
@@ -18,7 +19,7 @@ cdef class TimeUUID:
   cdef readonly uint64_t time
   cdef public bint descending
   
-  def __cinit__(TimeUUID self, uuid_pystr, bool descending=False):
+  def __cinit__(TimeUUID self, hex=None, bytes=None, bool descending=False):
     """
     Creates a new TimeUUID object instance.
     `uuid_pystr`: A Python string type object which represents the UUID in its
@@ -27,9 +28,13 @@ cdef class TimeUUID:
                   order? (optional, False by default, which sorts in ascending
                   order)
     """
-    uuid_pyutf8 = uuid_pystr.encode('utf-8')
-    cdef char *uuid_cstr = uuid_pyutf8
-    uuid_parse(uuid_cstr, self._bytes)
+    cdef char *tmp_cstr = NULL
+    if hex:
+      tmp_cstr = hex
+      uuid_parse(tmp_cstr, self._bytes)
+    else:
+      tmp_cstr = bytes
+      memcpy(self._bytes, tmp_cstr, 16)
 
     self.time = 0
     cdef uint64_t tmp = 0
