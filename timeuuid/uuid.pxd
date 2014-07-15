@@ -9,6 +9,7 @@ cdef extern from 'stdint.h' nogil:
 
 cdef extern from 'string.h' nogil:
   int memcmp(void *str1, void *str2, size_t n)
+  int memcpy(void *dest, void *src, size_t n)
 
 cdef extern from 'uuid/uuid.h' nogil:
   ctypedef unsigned char uuid_t[16]
