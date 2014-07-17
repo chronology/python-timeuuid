@@ -5,6 +5,7 @@
 
 from cpython cimport bool
 from cpython.object cimport Py_EQ, Py_GE, Py_GT, Py_LE, Py_LT, Py_NE
+from libc.stdlib cimport rand
 
 from uuid cimport int32_t
 from uuid cimport memcmp
@@ -12,6 +13,46 @@ from uuid cimport memcpy
 from uuid cimport uint64_t
 from uuid cimport uuid_parse
 from uuid cimport uuid_t
+
+
+cdef class UUIDType:
+  LOWEST = 0
+  HIGHEST = 1
+  RANDOM = 2
+
+
+cdef inline copy_time_to_uuid_bytes(uint64_t time, uuid_t bytes):
+  cdef uint64_t tmp = 0
+  # Bit-flipping logic from uuid1 implementation described in:
+  # http://stackoverflow.com/questions/7153844/uuid1-from-utc-timestamp-in-python
+  # time_low
+  tmp = time & 0xffffffff
+  for i, j in enumerate(range(24, -8, -8)):
+    bytes[i] = (tmp >> j) & 0xff
+  # time_mid
+  tmp = (time >> 32) & 0xffff
+  bytes[4] = (tmp >> 8) & 0xff
+  bytes[5] = tmp & 0xff
+  # time_hi
+  tmp = (time >> 48) & 0xfff
+  bytes[6] = (tmp >> 8) & 0xf
+  bytes[7] = tmp & 0xff
+
+cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
+  cdef uuid_t bytes
+  copy_time_to_uuid_bytes(time, bytes)
+  if (type == UUIDType.LOWEST):
+    for i in range(8, 16):
+      bytes[i] = 0
+  elif (type == UUIDType.HIGHEST):
+    bytes[6] |= 0xf0
+    for i in range(8, 16):
+      bytes[i] = 0xff
+  else:
+    bytes[6] |= rand() & 0xf0
+    for i in range(8, 16):
+      bytes[i] = rand()
+  return TimeUUID(bytes=bytes[:16])
 
 
 cdef class TimeUUID:
