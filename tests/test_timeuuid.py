@@ -81,9 +81,9 @@ class TestTimeUUID(unittest.TestCase):
     for uuid_str in get_str_uuids(100):
       uu = UUID(uuid_str)
       low = timeuuid_from_time(uu.time, UUIDType.LOWEST)
-      hi = timeuuid_from_time(uu.time, UUIDType.HIGHEST)
-      self.assertTrue(low < hi)
+      high = timeuuid_from_time(uu.time, UUIDType.HIGHEST)
+      self.assertTrue(low < high)
       for i in xrange(5000):
         rand = timeuuid_from_time(uu.time, UUIDType.RANDOM)
         self.assertTrue(low < rand)
-        self.assertTrue(hi > rand)
+        self.assertTrue(high > rand)

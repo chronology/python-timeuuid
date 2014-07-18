@@ -41,7 +41,8 @@ cdef inline copy_time_to_uuid_bytes(uint64_t time, uuid_t bytes):
 cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
   """
   Returns a TimeUUID instance which has the time attribute equal to `time`.
-  `type` describes how the remaining bytes are set.
+  `type` describes how the remaining bytes are set. It must be an attribute of
+  `UUIDType`.
   """
   cdef uuid_t bytes
   copy_time_to_uuid_bytes(time, bytes)
