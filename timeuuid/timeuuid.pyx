@@ -35,7 +35,7 @@ cdef inline copy_time_to_uuid_bytes(uint64_t time, uuid_t bytes):
   bytes[5] = tmp & 0xff
   # time_hi
   tmp = (time >> 48) & 0xfff
-  bytes[6] = (tmp >> 8) & 0xf
+  bytes[6] = ((tmp >> 8) & 0xf) | 0x10 # version 1
   bytes[7] = tmp & 0xff
 
 cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
@@ -45,17 +45,21 @@ cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
   """
   cdef uuid_t bytes
   copy_time_to_uuid_bytes(time, bytes)
+
   if (type == UUIDType.LOWEST):
     for i in range(8, 16):
       bytes[i] = 0
   elif (type == UUIDType.HIGHEST):
-    bytes[6] |= 0xf0
     for i in range(8, 16):
       bytes[i] = 0xff
   else:
-    bytes[6] |= rand() & 0xf0
     for i in range(8, 16):
       bytes[i] = rand()
+
+  # Set the variant to RFC 4122.
+  bytes[8] |= 0x80
+  bytes[8] &= 0x8f
+
   return TimeUUID(bytes=bytes[:16])
 
 
