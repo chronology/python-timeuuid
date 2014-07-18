@@ -5,6 +5,8 @@ import uuid
 from uuid import UUID
 
 from timeuuid import TimeUUID
+from timeuuid import timeuuid_from_time
+from timeuuid import UUIDType
 
 def py_cmp(tu1, tu2):
   return cmp((tu1.time, tu1.bytes), (tu2.time, tu2.bytes))
@@ -67,3 +69,21 @@ class TestTimeUUID(unittest.TestCase):
       tuu1 = TimeUUID(str(uu))
       tuu2 = TimeUUID(bytes=uu.bytes)
       self.assertEqual(tuu1, tuu2)
+
+  def test_timeuuid_from_time(self):
+    for uuid_str in get_str_uuids(10000):
+      uu = UUID(uuid_str)
+      for t in (UUIDType.LOWEST, UUIDType.HIGHEST, UUIDType.RANDOM):
+        tuu = timeuuid_from_time(uu.time, type=t)
+        self.assertEqual(uu.time, tuu.time)
+
+  def test_timeuuid_low_high(self):
+    for uuid_str in get_str_uuids(100):
+      uu = UUID(uuid_str)
+      low = timeuuid_from_time(uu.time, UUIDType.LOWEST)
+      high = timeuuid_from_time(uu.time, UUIDType.HIGHEST)
+      self.assertTrue(low < high)
+      for i in xrange(5000):
+        rand = timeuuid_from_time(uu.time, UUIDType.RANDOM)
+        self.assertTrue(low < rand)
+        self.assertTrue(high > rand)
