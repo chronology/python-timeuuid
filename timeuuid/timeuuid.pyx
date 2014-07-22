@@ -125,7 +125,7 @@ cdef class TimeUUID:
   def __str__(self):
     cdef char string[36]
     uuid_unparse(self._bytes, &string[0])
-    cdef bytes py_bytes = string[:36]
+    cdef bytes py_bytes = string
     return py_bytes
 
   def __repr__(self):
