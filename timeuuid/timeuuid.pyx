@@ -13,6 +13,7 @@ from uuid cimport memcpy
 from uuid cimport uint64_t
 from uuid cimport uuid_parse
 from uuid cimport uuid_t
+from uuid cimport uuid_unparse
 
 
 cdef class UUIDType:
@@ -122,13 +123,10 @@ cdef class TimeUUID:
     return result ^ self.descending
 
   def __str__(self):
-    # XXX: This is a slow function. Purposefully so because the main goal
-    # is low memory footprint, fast object construction and fast cmp.
-    i = 0
-    for b in self._bytes[:16]:
-      i = (i << 8) | ord(b)
-    h = '%032x' % i
-    return '%s-%s-%s-%s-%s' % (h[:8], h[8:12], h[12:16], h[16:20], h[20:])
+    cdef char string[36]
+    uuid_unparse(self._bytes, &string[0])
+    cdef bytes py_bytes = string[:36]
+    return py_bytes
 
   def __repr__(self):
     return 'TimeUUID(%s)' % self.__str__()

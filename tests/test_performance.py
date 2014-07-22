@@ -41,3 +41,10 @@ def test_cmp():
     uuids = create(cls, 100000)
     with timeit(cls.__name__):
       compare(uuids, 500000)
+
+def test_str():
+  print
+  for cls in [UUID, TimeUUID]:
+    uuids = create(cls, 100000)
+    with timeit(cls.__name__):
+      map(lambda u: str(u), uuids)
