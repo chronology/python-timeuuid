@@ -14,3 +14,4 @@ cdef extern from 'string.h' nogil:
 cdef extern from 'uuid/uuid.h' nogil:
   ctypedef unsigned char uuid_t[16]
   int uuid_parse(const_char_ptr indata, uuid_t uu)
+  void uuid_unparse(uuid_t uu, char *out)
