@@ -39,6 +39,7 @@ cdef inline copy_time_to_uuid_bytes(uint64_t time, uuid_t bytes):
   bytes[6] = ((tmp >> 8) & 0xf) | 0x10 # version 1
   bytes[7] = tmp & 0xff
 
+
 cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
   """
   Returns a TimeUUID instance which has the time attribute equal to `time`.
@@ -48,10 +49,10 @@ cpdef timeuuid_from_time(uint64_t time, int32_t type=UUIDType.RANDOM):
   cdef uuid_t bytes
   copy_time_to_uuid_bytes(time, bytes)
 
-  if (type == UUIDType.LOWEST):
+  if type == UUIDType.LOWEST:
     for i in range(8, 16):
       bytes[i] = 0
-  elif (type == UUIDType.HIGHEST):
+  elif type == UUIDType.HIGHEST:
     for i in range(8, 16):
       bytes[i] = 0xff
   else:
