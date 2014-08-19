@@ -1,4 +1,4 @@
 include MANIFEST.in MANIFEST
 include LICENSE README.md
+include requirements.txt
 recursive-include timeuuid *.py *.pyx *.pxd uuid.c
-recursive-include tests *.py
