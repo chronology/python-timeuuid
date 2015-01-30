@@ -6,6 +6,7 @@ __version_info__ = (0, 3, 5)
 __version__ = '.'.join(map(str, __version_info__))
 
 import os
+import sys
 
 from distutils.command.sdist import sdist
 from distutils.core import setup
@@ -29,9 +30,14 @@ REQUIREMENTS = [
                                              'requirements.txt')).readlines()
   ]
 
+if sys.platform == "darwin":
+  libraries = []
+else:
+  libraries = ['uuid']
+
 ext_modules = [Extension('timeuuid.timeuuid',
                          sources=['timeuuid/timeuuid.%s' % EXTENSION],
-                         libraries=['uuid'])]
+                         libraries=libraries)]
 
 setup_kwargs = {}
 
